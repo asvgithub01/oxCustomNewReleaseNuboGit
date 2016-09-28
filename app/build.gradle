@@ -1,0 +1,121 @@
+/*
+ * Created by Orchextra
+ *
+ * Copyright (C) 2016 Gigigo Mobile Services SL
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'com.android.application'
+apply from: rootProject.file('gradle/checkstyle.gradle')
+
+android {
+    compileSdkVersion parent.ext.androidCompileSdkVersion
+    //  buildToolsVersion parent.ext.androidBuildToolsVersion
+    buildToolsVersion = "23.0.1"
+    defaultConfig {
+        applicationId "gigigo.com.orchextrasdk"
+        minSdkVersion 11
+        //parent.ext.androidMinSdkVersion //you can change that, but you need API >=10 for fabmenu
+        targetSdkVersion parent.ext.androidTargetSdkVersion
+        versionCode parent.ext.androidVersionCode
+        versionName parent.ext.androidVersionName
+        //for VuforiaCredentials,VuforiaCredentials Only work with armv7 lib.so, in this case we exclude all
+        //less than armv7, but not with exclude, wit Ndk { abifilters
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
+        //java8
+//        jackOptions {
+//            enabled true
+//        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled = true
+            debuggable true
+        }
+        release {
+            debuggable true
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
+        }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+/*
+  dexOptions {
+    // Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
+    preDexLibraries = preDexEnabled && !travisBuild && !jenkinsBuild
+  }
+*/
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7 //java7
+        targetCompatibility JavaVersion.VERSION_1_7 //java7
+    }
+
+    productFlavors {
+        play7 {}
+        play8 {}
+        play9 {}
+        playno {}
+    }
+}
+
+configurations {
+    play7DebugCompile
+    play8DebugCompile
+    play9DebugCompile
+    playnoDebugCompile
+    play7ReleaseCompile
+    play8ReleaseCompile
+    play9ReleaseCompile
+    playnoReleaseCompile
+}
+
+dependencies {
+
+//fab menu webview
+    compile 'com.github.Gigigo-Android-Devs:fabmenu:proto'
+
+    //tiene refencia a otra ggglib 104/ahora la de nubo apunta a la 5.2 y sin support
+    compile parent.ext.dependencies.imageRecognitionImpl //vuforia new nuborisar version
+
+    //flavour dependencies from project, for test(necesary for generate builtsvariants aars)
+    play7DebugCompile project(path: ':orchextrasdk', configuration: 'play7Debug')
+    play8DebugCompile project(path: ':orchextrasdk', configuration: 'play8Debug')
+    play9DebugCompile project(path: ':orchextrasdk', configuration: 'play9Debug')
+    //test noplay, without play services, not work geofecing, segmentacion spatial, schedulable actions
+    playnoDebugCompile project(path: ':orchextrasdk', configuration: 'playnoDebug')
+
+    play7ReleaseCompile project(path: ':orchextrasdk', configuration: 'play7Release')
+    play8ReleaseCompile project(path: ':orchextrasdk', configuration: 'play8Release')
+    play9ReleaseCompile project(path: ':orchextrasdk', configuration: 'play9Release')
+    //test noplay, without play services, not work geofecing, segmentacion spatial, schedulable actions
+    playnoReleaseCompile project(path: ':orchextrasdk', configuration: 'playnoRelease')
+
+    testCompile parent.ext.testDependencies.junit
+
+    //AppCompatActivity
+    compile 'com.android.support:appcompat-v7:22.1.0'
+
+
+}
