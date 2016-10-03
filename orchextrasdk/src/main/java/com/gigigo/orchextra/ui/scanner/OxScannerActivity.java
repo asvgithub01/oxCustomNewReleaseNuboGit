@@ -38,7 +38,8 @@ import orchextra.javax.inject.Inject;
 
 import me.dm7.barcodescanner.zbar.Result;
 
-public class OxScannerActivity extends OxToolbarActivity implements OxCodeScannerView, OxZBarScannerView.ResultHandler {
+public class OxScannerActivity extends OxToolbarActivity
+        implements OxCodeScannerView, OxZBarScannerView.ResultHandler {
 
     @Inject PermissionChecker permissionChecker;
     @Inject PermissionCameraImp cameraPermissionImp;
